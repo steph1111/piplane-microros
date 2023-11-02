@@ -16,3 +16,11 @@ There are lots and lots of subrepos.
 ## Building in vscode 
 
 You may have to scan for kits and select a kit as shown in the [Getting started with RPi Pico Instructions](https://ubuntu.com/blog/getting-started-with-micro-ros-on-raspberry-pi-pico)
+
+## Uploading to the Pi Pico 
+
+The binary is in `build/seahawk.uf2`. You can install it by: 
+
+```console
+cp build/seahawk.uf2 /media/$USER/RPI-RP2
+```
