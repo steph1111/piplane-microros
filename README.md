@@ -8,7 +8,7 @@ After checking out this repo you must:
 
 ```
 git submodule init 
-git submodule update --recursive
+git submodule update --init --recursive
 ```
 
 There are lots and lots of subrepos. 
