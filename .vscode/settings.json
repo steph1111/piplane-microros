@@ -1,0 +1,8 @@
+{
+    "cmake.configureEnvironment": {
+        "PICO_SDK_PATH": "${workspaceFolder}/src/pico-sdk",
+        "MICRO_ROS_RPI_PICO_PATH": "${workspaceFolder}/src/micro_ros_raspberrypi_pico_sdk",
+    },
+    "git.detectSubmodules": false,
+    "cmake.sourceDirectory": "${workspaceFolder}/src/seahawk",
+}
