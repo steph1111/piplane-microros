@@ -1,5 +1,14 @@
 #include <stdio.h>
-#include <bool.h>
+#include <stdbool.h>
+
+#include <rcl/rcl.h>
+#include <rcl/error_handling.h>
+#include <rclc/rclc.h>
+#include <rclc/executor.h>
+#include <std_msgs/msg/int32.h>
+#include <std_msgs/msg/int16_multi_array.h>
+#include <rmw_microros/rmw_microros.h>
+#include <stdio.h>
 
 #include <rcl/rcl.h>
 #include <rcl/error_handling.h>
