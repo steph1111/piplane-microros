@@ -4,5 +4,5 @@
         "MICRO_ROS_RPI_PICO_PATH": "${workspaceFolder}/src/micro_ros_raspberrypi_pico_sdk",
     },
     "git.detectSubmodules": false,
-    "cmake.sourceDirectory": "${workspaceFolder}/src/seahawk",
+    "cmake.sourceDirectory": "/home/steph/Documents/projects/piplane_microros/src/piplane",
 }
