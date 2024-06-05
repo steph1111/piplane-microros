@@ -2,7 +2,7 @@
 #define DSHOT_H_
 
 #include <stdint.h>
-#include <bool.h>
+#include <stdbool.h>
 
 // TODO: Look at which of these are actually important
 #include "hardware/pio.h"

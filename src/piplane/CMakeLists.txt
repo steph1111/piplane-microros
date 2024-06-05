@@ -8,6 +8,13 @@ set(CMAKE_CXX_STANDARD 17)
 
 pico_sdk_init()
 
+
+# add_library(dshot INTERFACE)
+
+# target_sources(dshot INTERFACE ${CMAKE_CURRENT_LIST_DIR}/dshot.c)
+# target_includpico_generate_pio_header(piplane ${CMAKE_CURRENT_LIST_DIR}/dshot_encoder.pio)
+# e_directories(dshot INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+
 link_directories($ENV{MICRO_ROS_RPI_PICO_PATH}/libmicroros)
 
 add_executable(piplane
@@ -39,3 +46,5 @@ add_compile_definitions(PICO_STDIO_DEFAULT_CRLF=0)
 
 # Generate UF2
 pico_add_extra_outputs(piplane)
+
+pico_generate_pio_header(piplane ${CMAKE_CURRENT_LIST_DIR}/dshot_encoder.pio)
