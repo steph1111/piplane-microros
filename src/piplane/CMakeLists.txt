@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.12)
 
-include(pico_sdk_import.cmake)
+include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
 project(piplane C CXX ASM)
-# set(CMAKE_C_STANDARD 11)
-# set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 pico_sdk_init()
 
@@ -23,7 +23,6 @@ add_executable(piplane
 
 target_link_libraries(${PROJECT_NAME} INTERFACE
 	pico_stdlib
-	pico_stdlib
     microros
 	hardware_pio
     hardware_pwm
@@ -34,6 +33,9 @@ target_include_directories(piplane PUBLIC
 
 
 add_subdirectory(examples EXCLUDE_FROM_ALL)
+
+SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections")
 
 
 # Configure Pico
