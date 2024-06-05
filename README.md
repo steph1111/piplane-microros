@@ -1,6 +1,6 @@
 # Micro ROS Code for the RPI2040 
 
-This repo is a working, empty project. Put the seahawk code in `src/seahawk/seahawk.c`. Supporting code is checked in as a submodule. 
+This repo is a working, empty project. Put the seahawk code in `src/pidrone/pidrone.c`. Supporting code is checked in as a submodule. 
 
 ## Checkout 
 
@@ -19,8 +19,8 @@ You may have to scan for kits and select a kit as shown in the [Getting started 
 
 ## Uploading to the Pi Pico 
 
-The binary is in `build/seahawk.uf2`. You can install it by: 
+The binary is in `build/pidrone.uf2`. You can install it by: 
 
 ```console
-cp build/seahawk.uf2 /media/$USER/RPI-RP2
+cp build/pidrone.uf2 /media/$USER/RPI-RP2
 ```
