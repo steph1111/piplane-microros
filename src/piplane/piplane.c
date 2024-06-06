@@ -66,11 +66,18 @@ int main()
     * 4 channels starting on pin 2 */
     dshot_controller_init(&controller0, 300, pio0, 0, 2, NUM_MOTORS);
 
-    for (uint8_t i = 0; i < 4; i++)
-    {
-		dshot_throttle(&controller0, i, 100);
-        
-    }
+    for (int i = 0; i < 4; i++) {
+			dshot_throttle(&controller0, i, 0);
+        }
+
+    while (true) {
+		/* at the beginning of the first second, spin the first motor. On the second second, spin the second motor, etc */
+		for (int i = 0; i < 4; i++) {
+			dshot_throttle(&controller0, i, 100);
+        }
+		/* run the dshot loop */
+		dshot_loop(&controller0);
+	}
     sleep_ms(500);
     gpio_put(LED_PIN, 0);
     sleep_ms(500);
