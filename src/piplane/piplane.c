@@ -66,10 +66,10 @@ int main()
     * 4 channels starting on pin 2 */
     dshot_controller_init(&controller0, 300, pio0, 0, 2, NUM_MOTORS);
 
-    for (uint8_t i = 0; i < 4; ++i)
+    for (uint8_t i = 0; i < 4; i++)
     {
-        dshot_command(&controller0, i, DSHOT_CMD_BEEP1);
-        dshot_loop(&controller0);
+		dshot_throttle(&controller0, i, 100);
+        
     }
     sleep_ms(500);
     gpio_put(LED_PIN, 0);
