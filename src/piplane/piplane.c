@@ -59,29 +59,13 @@ int main()
     gpio_set_dir(LED_PIN, GPIO_OUT);
     gpio_put(LED_PIN, 1);
     
+    gpio_put(LED_PIN, 1);
 
     stdio_init_all();
     /*
     Initilizes controller 0 with DSHOT 300 on pio0, state machine 0,
     * 4 channels starting on pin 2 */
     dshot_controller_init(&controller0, 300, pio0, 0, 2, NUM_MOTORS);
-
-    for (int i = 0; i < 4; i++) {
-			dshot_throttle(&controller0, i, 0);
-        }
-
-    while (true) {
-		/* at the beginning of the first second, spin the first motor. On the second second, spin the second motor, etc */
-		for (int i = 0; i < 4; i++) {
-			dshot_throttle(&controller0, i, 100);
-        }
-		/* run the dshot loop */
-		dshot_loop(&controller0);
-	}
-    sleep_ms(500);
-    gpio_put(LED_PIN, 0);
-    sleep_ms(500);
-    gpio_put(LED_PIN, 1);
 
     // Get type support for Int16MultiArray (Change to correct type)
     const rosidl_message_type_support_t *type_support = ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int16MultiArray);
@@ -116,7 +100,7 @@ int main()
 
     rclc_support_init(&support, 0, NULL, &allocator);
 
-    rclc_node_init_default(&node, "pico_node", "", &support);
+    rclc_node_init_default(&node, "motor_array", "", &support);
 
     // Define msg
     std_msgs__msg__Int16MultiArray msg;
@@ -137,9 +121,8 @@ int main()
     msg_layout.data_offset = 0;
     msg.layout = msg_layout;
 
-    // Subscribe to topic
-    // No actual input setup from the Pi yet
-    ret = rclc_subscription_init_default(&subscriber, &node, type_support, "/dshot_throttle");
+    // Subscribe to topic from Pi, motor_array
+    ret = rclc_subscription_init_default(&subscriber, &node, type_support, "motor_array");
     rclc_executor_init(&executor, &support.context, 1, &allocator);
     // Choose callback for subscription
     rclc_executor_add_subscription(&executor, &subscriber, &msg, &subscription_callback, ON_NEW_DATA);
@@ -152,3 +135,39 @@ int main()
     gpio_put(LED_PIN, 0);
     return 0;
 }
+
+
+
+// #include <stdio.h>
+// #include "pico/stdlib.h"
+// #include "dshot.h"
+
+// struct dshot_controller controller0;
+
+// int main(void)
+// {
+// 	int time;
+
+// 	stdio_init_all();
+
+// 	/* initialize controller 0 with DSHOT600 on pio0, state machine 0
+// 	 * with 4 channels starting on pin 2 */
+// 	dshot_controller_init(&controller0, 300, pio0, 0, 2, 4);
+
+ 
+// 	while (true) {
+// 		time = to_ms_since_boot(get_absolute_time());
+// 		/* at the beginning of the first second, spin the first motor. On the second second, spin the second motor, etc */
+// 		for (int i = 0; i < 4; i++) {
+// 			if (time > (2000))
+// 				dshot_throttle(&controller0, i, 200);
+// 			else
+// 				dshot_throttle(&controller0, i, 0);
+// 		}
+
+// 		/* run the dshot loop */
+// 		dshot_loop(&controller0);
+// 	}
+
+// 	return 0;
+// }
