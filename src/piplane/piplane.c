@@ -14,6 +14,20 @@
 rcl_subscription_t subscriber;
 int16_t motor_throttles[4] = {0, 0, 0, 0};
 
+
+void subscription_callback(const void *msgin) {
+  gpio_put(15, 0);
+
+  // Set the msgin to an Int16MultiArray
+  // Expects array len 4, values 0-2047
+  const std_msgs__msg__Int16MultiArray *msg =
+      (const std_msgs__msg__Int16MultiArray *)msgin;
+
+  for (int i = 0; i < 4 && i < msg->data.size; i++) {
+    motor_throttles[i] = msg->data.data[i];
+  }
+}
+
 #include "dshot.h"
 #include "pico/stdlib.h"
 #include <stdio.h>
