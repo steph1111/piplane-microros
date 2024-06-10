@@ -48,3 +48,4 @@ add_compile_definitions(PICO_STDIO_DEFAULT_CRLF=0)
 pico_add_extra_outputs(piplane)
 
 pico_generate_pio_header(piplane ${CMAKE_CURRENT_LIST_DIR}/dshot.pio)
+
