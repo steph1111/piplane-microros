@@ -10,31 +10,46 @@
 #include <std_msgs/msg/int16_multi_array.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include "pico/multicore.h"
 
 rcl_subscription_t subscriber;
-int16_t motor_throttles[4] = {0, 0, 0, 0};
 
+int16_t motor_throttles[4] = {0, 0, 0, 0};
+struct dshot_controller controller0;
+
+void core1_main() {
+  while (true) {
+
+    gpio_put(15, 1);
+    for (int i = 0; i < 4; i++) {
+      dshot_throttle(&controller0, i, motor_throttles[i]);
+    }
+
+    dshot_loop(&controller0);
+    gpio_put(15, 0);
+  }
+}
 
 void subscription_callback(const void *msgin) {
-
+  gpio_put(15, 1);
   // Set the msgin to an Int16MultiArray
   // Expects array len 4, values 0-2047
   const std_msgs__msg__Int16MultiArray *msg =
       (const std_msgs__msg__Int16MultiArray *)msgin;
 
-  for (int i = 0; i < 4 && i < msg->data.size; i++) {
+  for (int i = 0; i < 4; i++) {
     motor_throttles[i] = msg->data.data[i];
   }
+
+  gpio_put(15, 0);
 }
 
-struct dshot_controller controller0;
-
-int main(void) {
+int foo_main(void) {
   stdio_init_all();
 
   /* initialize controller 0 with DSHOT300 on pio0, state machine 0
    * with 1 channel on pin 2 */
-  dshot_controller_init(&controller0, 150, pio0, 0, 2, 4);
+  dshot_controller_init(&controller0, 300, pio0, 0, 2, 4);
 
   gpio_init(15);
   gpio_set_dir(15, GPIO_OUT);
@@ -59,11 +74,6 @@ int main(void) {
   const uint8_t attempts = 120;
 
   rcl_ret_t ret = rmw_uros_ping_agent(timeout_ms, attempts);
-
-  if (ret != RCL_RET_OK) {
-    gpio_put(15, 0);
-    return ret; // Unreachable agent, exiting program.
-  }
 
   rclc_support_init(&support, 0, NULL, &allocator);
 
@@ -100,27 +110,38 @@ int main(void) {
   // Subscribe to topic from Pi, motor_array
   ret = rclc_subscription_init_default(&subscriber, &node, type_support,
                                        "/motor_array");
-  rclc_executor_init(&executor, &support.context, 1, &allocator);
+  if (ret != RCL_RET_OK) {
+    return ret; // Unreachable agent, exiting program.
+  }
+  rclc_executor_init(&executor, &support.context, 4, &allocator);
 
   // Choose callback for subscription
   rclc_executor_add_subscription(&executor, &subscriber, &msg,
                                  &subscription_callback, ON_NEW_DATA);
 
+  multicore_launch_core1(core1_main);
+
+  gpio_put(15, 0);
+
   while (true) {
-    rclc_executor_spin_some(&executor, RCL_MS_TO_NS(1));
+    // gpio_put(15, 1);
+
+    rclc_executor_spin(&executor);
     // time = to_ms_since_boot(get_absolute_time());
 
     /* set motor throttles based on received array */
-
-    for (int i = 0; i < 4; i++) {
-    //   if (time > 5000) {
-        dshot_throttle(&controller0, i, motor_throttles[i]);
-    //   } else {
-    //     dshot_throttle(&controller0, i, 0);
-    //   }
-    }
-
-    dshot_loop(&controller0);
   }
+  return 0;
+}
+
+int main() {
+  foo_main();
+  while (true) {
+    gpio_put(15, 1);
+    sleep_ms(500);
+    gpio_put(15, 0);
+    sleep_ms(500);
+  }
+
   return 0;
 }

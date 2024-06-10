@@ -27,6 +27,7 @@ target_link_libraries(piplane
     microros
     hardware_pwm
     hardware_pio
+    pico_multicore
 )
 
 target_include_directories(piplane PUBLIC

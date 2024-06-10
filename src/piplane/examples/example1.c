@@ -8,9 +8,9 @@ int main(void)
 {
 	stdio_init_all();
 
-	/* initialize controller 0 with DSHOT600 on pio0, state machine 0
+	/* initialize controller 0 with DSHOT300 on pio0, state machine 0
 	 * with 1 channel on pin 2 */
-	dshot_controller_init(&controller0, 150, pio0, 0, 2, 1);
+	dshot_controller_init(&controller0, 300, pio0, 0, 3, 1);
 
 	while (true) {
 		/* beep every 4 seconds, send throttle value of zero otherwise */

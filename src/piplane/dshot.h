@@ -8,7 +8,7 @@
 /* Raspberry Pi Pico has 26 GPIOs */
 #define DSHOT_MAX_CHANNELS		 	26
 /* Emergency stop is performed after an idle timeout of 500 ms */
-#define DSHOT_IDLE_THRESHOLD			(500 * 1000)
+#define DSHOT_IDLE_THRESHOLD			(1500 * 1000)
 
 /**
  * dshot_telemetry_type - telemetry type which can be received by the eRPM protocol.
