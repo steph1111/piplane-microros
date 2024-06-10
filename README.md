@@ -19,7 +19,7 @@ You may have to scan for kits and select a kit as shown in the [Getting started 
 The binary is in `build/piplane.uf2`. You can install it by: 
 
 ```console
-cp build/pidrone.uf2 /media/$USER/RPI-RP2
+cp build/piplane.uf2 /media/$USER/RPI-RP2
 ```
 ## ROS2 Integration
 The Pico will expect a ROS2 topic called **/motor_array**
