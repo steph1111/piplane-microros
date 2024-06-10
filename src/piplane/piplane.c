@@ -1,5 +1,6 @@
 #include "dshot.h"
 #include "hardware/pio.h"
+#include "pico/multicore.h"
 #include "pico/stdlib.h"
 #include "pico_uart_transports.h"
 #include <rcl/error_handling.h>
@@ -10,50 +11,66 @@
 #include <std_msgs/msg/int16_multi_array.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "pico/multicore.h"
+
+/* TODO:
+ * Motor Armed Check, Commands, Telementry --> See dshot.h & examples*
+
+ * This code will likey be used for Cabrillo Robotics ROV:
+ *   It may be prudent to split motor control to more cores/controllers
+ *   IE: struct dshot_controller controller0, controller1 */
+
+/* Credit for DSHOT Implementation goes to https://github.com/simonwunderlich
+ *  Thanks! */
 
 rcl_subscription_t subscriber;
-
 int16_t motor_throttles[4] = {0, 0, 0, 0};
+const int NUM_MOTORS = 4;
+const int DEBUG_LED = 15;
+const int DSHOT_PROTOCOL = 600;
+
 struct dshot_controller controller0;
 
 void core1_main() {
+  /* Core 1 Runs the DSHOT Loop. Precise timing necessitate by DSHOT,
+  causes latency problem when MicroROS and DSHOT are computed on the same core.
+  */
   while (true) {
-
-    gpio_put(15, 1);
-    for (int i = 0; i < 4; i++) {
+    // gpio_put(DEBUG_LED, 1);
+    for (int i = 0; i < NUM_MOTORS; i++) {
       dshot_throttle(&controller0, i, motor_throttles[i]);
     }
 
     dshot_loop(&controller0);
-    gpio_put(15, 0);
+    // gpio_put(DEBUG_LED, 0);
   }
 }
 
 void subscription_callback(const void *msgin) {
-  gpio_put(15, 1);
   // Set the msgin to an Int16MultiArray
   // Expects array len 4, values 0-2047
+
+  // gpio_put(DEBUG_LED, 1);
+
   const std_msgs__msg__Int16MultiArray *msg =
       (const std_msgs__msg__Int16MultiArray *)msgin;
 
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < NUM_MOTORS; ++i) {
     motor_throttles[i] = msg->data.data[i];
   }
 
-  gpio_put(15, 0);
+  // gpio_put(DEBUG_LED, 0);
 }
 
-int foo_main(void) {
+int main(void) {
   stdio_init_all();
 
-  /* initialize controller 0 with DSHOT300 on pio0, state machine 0
-   * with 1 channel on pin 2 */
-  dshot_controller_init(&controller0, 300, pio0, 0, 2, 4);
+  /* initialize controller 0 with DSHOT_PROTOCOL on pio0, state machine 0
+   * with 4 channel on pin 2-5 */
+  dshot_controller_init(&controller0, DSHOT_PROTOCOL, pio0, 0, 2, NUM_MOTORS);
 
-  gpio_init(15);
-  gpio_set_dir(15, GPIO_OUT);
-  gpio_put(15, 1);
+  gpio_init(DEBUG_LED);
+  gpio_set_dir(DEBUG_LED, GPIO_OUT);
+  gpio_put(DEBUG_LED, 1);
 
   const rosidl_message_type_support_t *type_support =
       ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int16MultiArray);
@@ -119,29 +136,14 @@ int foo_main(void) {
   rclc_executor_add_subscription(&executor, &subscriber, &msg,
                                  &subscription_callback, ON_NEW_DATA);
 
+  // Deals with PICO Pin control
   multicore_launch_core1(core1_main);
 
-  gpio_put(15, 0);
+  // gpio_put(DEBUG_LED, 0);
 
   while (true) {
-    // gpio_put(15, 1);
-
+    // gpio_put(DEBUG_LED, 1);
     rclc_executor_spin(&executor);
-    // time = to_ms_since_boot(get_absolute_time());
-
-    /* set motor throttles based on received array */
   }
-  return 0;
-}
-
-int main() {
-  foo_main();
-  while (true) {
-    gpio_put(15, 1);
-    sleep_ms(500);
-    gpio_put(15, 0);
-    sleep_ms(500);
-  }
-
   return 0;
 }
