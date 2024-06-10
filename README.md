@@ -1,5 +1,4 @@
 # PiPlane/Drone DSHOT-MicroROS Code for the RPI2040(Pi Pico)
-This repo is a working, empty project. Put the seahawk code in `src/piplane/piplane.c`. Supporting code is checked in as a submodule. 
 
 ## Checkout 
 
